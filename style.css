@@ -1,0 +1,59 @@
+:root {
+    --bg-body: #F5F5DC;
+    --bg-viz: #f8f8f8;
+    --bg-inputs: #E8E8D0;
+    --text-color: #4A4A4A;
+    --panel-box: white;
+    --border: #BDBDA0;
+}
+
+[data-theme="dark"] {
+    --bg-body: #1A1A1A;
+    --bg-viz: #2D2D2D;
+    --bg-inputs: #333333;
+    --text-color: #E0E0E0;
+    --panel-box: #444444;
+    --border: #555555;
+}
+
+body {
+    font-family: 'Segoe UI', sans-serif;
+    background-color: var(--bg-body);
+    color: var(--text-color);
+    margin: 0;
+    display: flex;
+    flex-direction: row;
+    height: 100vh;
+    transition: all 0.3s;
+}
+
+/* Responsive: Celulares */
+@media (max-width: 850px) {
+    body { flex-direction: column; height: auto; }
+    .panel-inputs { order: 1; }
+    .panel-viz { order: 2; }
+}
+
+.panel-viz { flex: 3; display: flex; flex-direction: column; padding: 20px; gap: 15px; overflow-y: auto; }
+.panel-inputs { flex: 1; background-color: var(--bg-inputs); padding: 20px; display: flex; flex-direction: column; gap: 12px; border-left: 1px solid var(--border); min-width: 300px; }
+
+#canvas-container { height: 350px; background: var(--panel-box); border-radius: 10px; padding: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+#txt-res { background: var(--panel-box); border: 1px solid var(--border); padding: 15px; font-family: monospace; white-space: pre-wrap; border-radius: 5px; color: var(--text-color); }
+
+.input-group { display: flex; flex-direction: column; gap: 4px; }
+input, select { padding: 8px; border: 1px solid var(--border); border-radius: 4px; background: var(--panel-box); color: var(--text-color); }
+
+.button-row { display: flex; gap: 10px; }
+button { flex: 1; background-color: #6B8E23; color: white; border: none; padding: 10px; cursor: pointer; border-radius: 5px; font-weight: bold; }
+button:hover { opacity: 0.9; }
+#btn-clear { background-color: #8B4513; }
+#btn-theme { background: none; border: 1px solid var(--border); color: var(--text-color); margin-bottom: 10px; }
+
+#historial-container { margin-top: 20px; }
+.hist-item { background: var(--panel-box); padding: 8px; margin-bottom: 5px; border-radius: 4px; cursor: pointer; font-size: 0.8rem; border: 1px solid transparent; }
+.hist-item:hover { border-color: #6B8E23; }
+
+#tabla-container { background: var(--panel-box); padding: 15px; border-radius: 10px; overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 12px; }
+th { background-color: #6B8E23; color: white; padding: 8px; }
+td { border-bottom: 1px solid var(--border); padding: 6px; text-align: center; }

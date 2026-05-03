@@ -57,3 +57,5 @@ button:hover { opacity: 0.9; }
 table { width: 100%; border-collapse: collapse; font-size: 12px; }
 th { background-color: #6B8E23; color: white; padding: 8px; }
 td { border-bottom: 1px solid var(--border); padding: 6px; text-align: center; }
+
+#btn-comparar { background-color: #3A6186; }

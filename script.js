@@ -202,3 +202,113 @@ function renderizarGrafica(funcStr, raiz) {
         }
     });
 }
+
+// --- COMPARADOR DE METODOS ---
+function compararMetodos() {
+    const funcStr = document.getElementById('ent-func').value;
+    const a = parseFloat(document.getElementById('ent-a').value);
+    const b = parseFloat(document.getElementById('ent-b').value);
+    const tol = parseFloat(document.getElementById('ent-tol').value);
+    const maxIter = 100;
+
+    const f = (val) => math.evaluate(funcStr, { x: val });
+    const df = (val) => math.derivative(funcStr, 'x').evaluate({ x: val });
+
+    const metodos = [
+        {
+            nombre: "Bisección",
+            fn: () => metodoBiseccion(f, a, b, tol, maxIter)
+        },
+        {
+            nombre: "Regula Falsi",
+            fn: () => metodoRegulaFalsi(f, a, b, tol, maxIter)
+        },
+        {
+            nombre: "Newton-Raphson",
+            fn: () => metodoNewton(f, df, a, tol, maxIter)
+        },
+        {
+            nombre: "Secante",
+            fn: () => metodoSecante(f, a, b, tol, maxIter)
+        },
+        {
+            nombre: "Punto Fijo",
+            fn: () => metodoPuntoFijo(f, a, tol, maxIter)
+        }
+    ];
+
+    const resultados = [];
+
+    metodos.forEach(m => {
+        const t0 = performance.now();
+        try {
+            const res = m.fn();
+            const tiempo = performance.now() - t0;
+            resultados.push({
+                nombre:      m.nombre,
+                convergio:   true,
+                raiz:        res.raiz,
+                iteraciones: res.pasos.length,
+                error:       res.pasos[res.pasos.length - 1].error,
+                tiempo:      tiempo,
+                pasos:       res.pasos
+            });
+        } catch (e) {
+            resultados.push({
+                nombre:    m.nombre,
+                convergio: false,
+                motivo:    e.message
+            });
+        }
+    });
+
+    mostrarResultadosComparacion(resultados);
+}
+
+function mostrarResultadosComparacion(resultados) {
+    const convergidos = resultados.filter(r => r.convergio);
+
+    // Ranking por cada criterio (menor = mejor)
+    const porIter  = [...convergidos].sort((a, b) => a.iteraciones - b.iteraciones);
+    const porError = [...convergidos].sort((a, b) => a.error - b.error);
+    const porTiempo= [...convergidos].sort((a, b) => a.tiempo - b.tiempo);
+
+    // Puntaje combinado
+    const puntajes = {};
+    convergidos.forEach(r => puntajes[r.nombre] = 0);
+    [porIter, porError, porTiempo].forEach(lista => {
+        lista.forEach((r, pos) => puntajes[r.nombre] += pos);
+    });
+    const ganador = Object.entries(puntajes).sort((a, b) => a[1] - b[1])[0];
+
+    // texto
+    let texto = ` COMPARACIÓN DE MÉTODOS\n`;
+    texto += `${'─'.repeat(52)}\n`;
+    texto += `${'Método'.padEnd(18)} ${'Raíz'.padStart(10)} ${'Iter'.padStart(5)} ${'Error'.padStart(12)} ${'Tiempo'.padStart(9)}\n`;
+    texto += `${'─'.repeat(52)}\n`;
+
+    resultados.forEach(r => {
+        if (r.convergio) {
+            texto += ` ${r.nombre.padEnd(16)} ${r.raiz.toFixed(6).padStart(10)} ${String(r.iteraciones).padStart(5)} ${r.error.toExponential(2).padStart(12)} ${r.tiempo.toFixed(2).padStart(7)}ms\n`;
+        } else {
+            texto += ` ${r.nombre.padEnd(16)} No convergió: ${r.motivo}\n`;
+        }
+    });
+
+    texto += `${'─'.repeat(52)}\n`;
+    if (ganador) {
+        texto += ` Ganador general   : ${ganador[0]}\n`;
+        texto += ` Menos iteraciones : ${porIter[0].nombre}\n`;
+        texto += ` Más preciso       : ${porError[0].nombre}\n`;
+        texto += ` Más rápido        : ${porTiempo[0].nombre}\n`;
+    }
+
+    document.getElementById('txt-res').innerText = texto;
+
+    // Mostrar tabla ganador
+    if (ganador) {
+        const resGanador = convergidos.find(r => r.nombre === ganador[0]);
+        mostrarTabla(resGanador.pasos);
+        renderizarGrafica(document.getElementById('ent-func').value, resGanador.raiz);
+    }
+}
